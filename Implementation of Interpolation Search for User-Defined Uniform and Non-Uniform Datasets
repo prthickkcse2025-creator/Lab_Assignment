@@ -1,0 +1,68 @@
+import time
+import random
+
+def interpolation_search(arr, key):
+    """Performs interpolation search and returns (found, index, probes)."""
+    low = 0
+    high = len(arr) - 1
+    probes = 0
+    
+    while low <= high and key >= arr[low] and key <= arr[high]:
+        probes += 1
+        
+        # Avoid division by zero if all elements are the same
+        if arr[high] == arr[low]:
+            if arr[low] == key:
+                return True, low, probes
+            else:
+                return False, -1, probes
+        
+        # Interpolation formula
+        pos = low + int(((float(high - low) / (arr[high] - arr[low])) * (key - arr[low])))
+        
+        if arr[pos] == key:
+            return True, pos, probes
+        
+        if arr[pos] < key:
+            low = pos + 1
+        else:
+            high = pos - 1
+            
+    return False, -1, probes
+
+def get_dataset():
+    print("--- Dataset Options ---")
+    print("1. Uniformly Distributed (e.g., [2, 4, 6, 8, 10])")
+    print("2. Non-Uniformly Distributed (e.g., [1, 2, 4, 8, 16])")
+    choice = input("Select distribution type (1 or 2): ")
+    
+    size = int(input("Enter number of elements: "))
+    
+    if input("Generate randomly? (y/n): ").lower() == 'y':
+        if choice == '1':
+            # Uniform: Step-based generation
+            start = random.randint(0, 100)
+            step = random.randint(1, 10)
+            data = [start + i * step for i in range(size)]
+        else:
+            # Non-Uniform: Exponential/Random gaps
+            data = sorted([random.randint(0, 1000) for _ in range(size)])
+    else:
+        data = sorted([int(x) for x in input("Enter elements separated by space: ").split()])
+        
+    return data
+
+# --- Main Execution ---
+dataset = get_dataset()
+key = int(input("Enter the search key: "))
+
+start_time = time.perf_counter()
+found, index, probes = interpolation_search(dataset, key)
+end_time = time.perf_counter()
+
+print("\n--- Results ---")
+print(f"Dataset Sample: {dataset[:10]}..." if len(dataset) > 10 else f"Dataset: {dataset}")
+print(f"Key Found: {found}")
+print(f"Index Position: {index}")
+print(f"Number of Probes: {probes}")
+print(f"Execution Time: {(end_time - start_time) * 1000:.6f} ms")
